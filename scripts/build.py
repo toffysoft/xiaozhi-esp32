@@ -54,13 +54,29 @@ def get_project_version() -> Optional[str]:
     return None
 
 
+def _idf_argv_prefix() -> list[str]:
+    """Return the argv prefix that launches idf.py on the current platform.
+
+    `idf.py` on PATH is a Python script, not an executable. Windows
+    CreateProcess cannot run it, so subprocess fails with WinError 193 even
+    though the same name works from a shell (which resolves it through
+    PATHEXT). Launching it through the active interpreter works everywhere.
+    """
+    idf_path = os.environ.get("IDF_PATH")
+    if idf_path:
+        idf_py = Path(idf_path) / "tools" / "idf.py"
+        if idf_py.is_file():
+            return [sys.executable, str(idf_py)]
+    return ["idf.py"]
+
+
 def _run_idf(*args: str, preview: bool = False) -> None:
-    command = ["idf.py"]
+    idf_args = list(args)
     if preview:
-        command.append("--preview")
-    command.extend(args)
+        idf_args.insert(0, "--preview")
+    command = _idf_argv_prefix() + idf_args
     if subprocess.run(command, check=False).returncode != 0:
-        print(f"{' '.join(command)} failed", file=sys.stderr)
+        print(" ".join(["idf.py", *idf_args]) + " failed", file=sys.stderr)
         sys.exit(1)
 
 
