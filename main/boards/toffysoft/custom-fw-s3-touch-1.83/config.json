@@ -1,0 +1,14 @@
+{
+    "manufacturer": "toffysoft",
+    "type": "toffysoft-custom-fw-s3-touch-1.83",
+    "target": "esp32s3",
+    "builds": [
+        {
+            "name": "toffysoft-custom-fw-s3-touch-1.83",
+            "sdkconfig_append": [
+                "CONFIG_USE_WECHAT_MESSAGE_STYLE=n",
+                "CONFIG_USE_DEVICE_AEC=y"
+            ]
+        }
+    ]
+}
